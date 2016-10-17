@@ -1,0 +1,58 @@
+The Code Snippets in this file are from the Office 365: Migrating and Managing your Business in the Cloud.
+ISBN: 978-1-4302-6526-9
+
+The code is organized with as <chapter>.<page>
+
+
+@@Page  11.579
+## Verify the two endpoints to ensure that the ADFS server is configured:
+https://{your_federation_service_name}/adfs/fs/federationserverservice.asmx
+https://{your_federation_service_name}/adfs/services/trust/mex
+
+
+
+@@Page 11.581
+## Turning on Single Sign On
+
+Set-ExecutionPolicy RemoteSigned
+$LiveCred = Get-Credential
+Connect-MsolService -Credential $LiveCred.
+Set-MsolADFScontext -Computer kamindmgmtv2.kamind.com
+
+# - use if new domain
+#New-MsolFederatedDomain -DomainName kamind.com 
+# - use if existign domain 
+#Add-MSOLDFederatedDomain -domainame kamind.com
+Convert-MsolDomainToFederated -domainame kamind.com
+
+#Get Status of federated domain
+Get-MsolFederationProperty -DomainName kamind.com
+
+#if the domain does not match Federation
+Update-MsolFederatedDomain -DomainName kamind.com
+
+#Clean up and close the session
+Remove-PSSession $Session
+
+@@Page 11.594
+## Verifying ADFS connection
+## Create an Office 365 remote PowerShell Session
+$O365 = Get-Credential
+$session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://ps.outlook.com/PowerShell/ -Credential $O365Cred -Authentication Basic -AllowRedirection
+Import-PSSession $Session
+
+#Clean up and close the session
+Remove-PSSession $Session
+
+
+@@Page 11.596
+## Get Exchange certifcate
+Get-ExchangeCertificate | fl
+
+
+@@Page 11.597
+## Verify ADFS configuration and certificate configuration
+Get-WebServicesVirtualDirectory "EWS (Default Web Site)" | Fromat-Table Name, ExternalUrl
+Get-OabVirtualDirectory "OAB (Default Web Site)" | Fromat-Table Name, ExternalUrl
+Get-ActiveSyncVirtualDirectory "EWS (Default Web Site)" | Fromat-Table Name, ExternalUrl
+

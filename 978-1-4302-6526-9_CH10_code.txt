@@ -1,0 +1,22 @@
+The Code Snippets in this file are from the Office 365: Migrating and Managing your Business in the Cloud.
+ISBN: 978-1-4302-6526-9
+
+The code is organized with as <chapter>.<page>
+
+
+@@Page 10.532
+##Standard PowerShell header
+## Grant Send as Permissions to the IIS Account
+$LiveCred = Get-Credential
+Import-module msonline
+Connect-MSOLService –Credential $LiveCred –Verbose 
+
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange-ConnectionUri https://ps.outlook.com/powershell/ -Credential $LiveCred -Authentication Basic –AllowRedirection
+
+Import-PSSession $Session –Allow Clobber
+
+# Add the permissions to sender to send to the recipient
+Get-Mailbox | add-recipientpermission –trustee “IIS user account” – Accessrights sendas –confirm:$false
+
+#Clean up and close the session
+Remove-PSSession $Session

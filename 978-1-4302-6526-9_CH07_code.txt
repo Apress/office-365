@@ -1,0 +1,29 @@
+The Code Snippets in this file are from the Office 365: Migrating and Managing your Business in the Cloud.
+ISBN: 978-1-4302-6526-9
+
+The code is organized with as <chapter>.<page>
+
+
+@@Page 7.358
+## making USB memory stick
+DISKPART (enter)
+LIST DISK (enter) (this will list the disk devices, such as the USB stick)
+SELECT DISK 5 (in our case, the USB was listed as device 5)
+CLEAN
+CREATE PARTITION PRIMARY
+SELECT PARTITION 1
+ACTIVE
+FORMAT FS=NTFS QUICK
+ASSIGN
+EXIT
+
+
+@@Page 7.359
+## making Bootable USB memory stick
+BOOTSECT.EXE /NT60 ?:  <where ? is the USB drive letter>
+
+
+@@Page 7.362
+slmgr.vbs -ipk <yourproduct key>
+slmgr.vbs -ato
+

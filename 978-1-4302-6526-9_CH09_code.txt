@@ -1,0 +1,62 @@
+The Code Snippets in this file are from the Office 365: Migrating and Managing your Business in the Cloud.
+ISBN: 978-1-4302-6526-9
+
+The code is organized with as <chapter>.<page>
+
+
+@@Page 9.449
+##Standard PowerShell header
+## Enable mailbox audit logging for a single mailbox, run the following Windows PowerShell command:
+Set-Mailbox <Identity> -AuditEnabled $true
+
+## Enable mailbox auditing for a user named Sam Sneed, run the following command:
+Set-Mailbox "Sam Sneed" -AuditEnabled $true
+
+## Enable mailbox auditing for all user mailboxes in your organization, run the following commands:
+$UserMailboxes = Get-mailbox -Filter {(RecipientTypeDetails -eq 'UserMailbox')}
+$UserMailboxes | ForEach {Set-Mailbox $_.Identity -AuditEnabled $true}
+
+@@Page 9.451
+##Standard PowerShell header
+## Enable mailbox audit logging for a single mailbox, run the following Windows PowerShell command:
+Set-Mailbox <Identity> -AuditEnabled $true
+
+## Enable mailbox auditing for a user named Sam Sneed, run the following command:
+Set-Mailbox "Sam Sneed" -AuditEnabled $true
+
+## Enable mailbox auditing for all user mailboxes in your organization, run the following commands:
+$UserMailboxes = Get-mailbox -Filter {(RecipientTypeDetails -eq 'UserMailbox')}
+$UserMailboxes | ForEach {Set-Mailbox $_.Identity -AuditEnabled $true}
+
+@@Page 9.453
+##Standard PowerShell header
+## Discovery Mailbox
+Add-MailboxPermission "Discovery Search Mailbox" -User user@contoso.com -AccessRights FullAccess
+
+@@page 9.454
+##Standard PowerShell header
+##  Extend deleted item recovery
+Set-Mailbox <identity> -LitigationHoldEnabled $true -LitigationHoldDuration <duration, in days>
+
+## Extend the “delete” purges folder from 14 days to 30 days.
+Set-mailbox user@contoso.com –retaindeleteditemsfor 30
+
+
+@@page 9.477
+##ACS Query string
+(Guarantee OR Money OR Complaint OR Attorney OR Transfer OR Security OR Loss OR Loan OR Misrepresented OR Unauthorized OR Yield OR Stock OR Bond OR Security OR Percent OR Pay* OR Promise OR Funds OR Risk OR Secure OR Take* OR Pissed OR Churn)
+
+@@page 9.477
+##Standard PowerShell header
+## Create a new discovery search mailbox, use the following PowerShell command:
+New-Mailbox -Name <String> -Discovery
+
+## List all of the discovery mailboxes (these are not listed in the Exchange management console) run the following PowerShell command:
+Get-Mailbox -Resultsize unlimited -Filter {RecipientTypeDetails -eq "DiscoveryMailbox"}
+
+## Assign permissions to a specific person as a reviewer, use the Add-MailboxPermission command:
+Add-MailboxPermission <Display name of discovery mailbox> -User <Display Name> -AccessRights FullAccess
+
+## Find all permissions on a mailbox (remember a discovery Mailbox is just another mailbox), run the Get-MailboxPermission command:
+Get-MailboxPermission <Display name of discovery mailbox> | Format-Table User,AccessRights,Deny
+

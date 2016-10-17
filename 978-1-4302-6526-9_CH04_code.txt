@@ -1,0 +1,68 @@
+The Code Snippets in this file are from the Office 365: Migrating and Managing your Business in the Cloud.
+ISBN: 978-1-4302-6526-9
+
+The code is organized with as <chapter>.<page>
+
+
+
+
+
+@@Page 4.140
+## Test Powershell sequence for Installation
+Set-ExecutionPolicy RemoteSigned
+$LiveCred = Get-Credential
+Import-module msonline
+Connect-MSOLService –Credential $LiveCred –Verbose 
+Get-MsolGroup
+
+# Required to close PSS Session
+Remove-PSSession $Session
+
+
+@@Page 4.145
+
+##Registry Values to bypass Autodiscove
+## See Microsoft KB article – 2612922
+## Office 2007 -> registry key “12”
+## Office 2010 -> registry key “14”
+## Office 2013 -> registry key “15”
+HKEY_CURRENT_USER\Software\Microsoft\Office\12.0\Outlook\AutoDiscover
+
+##Registry Values
+"PreferLocalXML"=dword:1
+"ExcludeHttpRedirect"=dword:0
+"ExcludeHttpsAutodiscoverDomain"=dword:1
+"ExcludeHttpsRootDomain"=dword:1
+"ExcludeScpLookup"=dword:1
+"ExcludeSrvLookup"=dword:1
+"ExcludeSrvRecord"=dword:1
+
+
+##Remove domain force login User ID
+## See Microsft KB article 2848627
+## only add values if present and value is not zero
+
+## HKEY_CURRENT_USER\Software\Microsoft\Office\12.0\Outlook\RPC
+“UseWindowsUserCredentials”=dword:0
+
+## HKEY_CURRENT_USER\Software\Policies\Microsoft\Office\12.0\Outlook\RPC
+“UseWindowsUserCredentials”=dword:0
+
+@@Page 4.154
+## Extend 30-day delete for a mailbox
+Set-mailbox user@contoso.com –retaindeleteditemsfor 30
+
+## Extend 30-day delete for the Organization
+Get-mailbox | Set-mailbox –retaindeleteditemsfor 30
+
+@@Page 4.171
+
+##Retrive Exchange Mailbox Guid
+Set-ExecutionPolicy RemoteSigned
+$LiveCred = Get-Credential
+Import-module msonline
+Connect-MSOLService –Credential $LiveCred –Verbose 
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange-ConnectionUri https://ps.outlook.com/powershell/ -Credential $LiveCred -Authentication Basic –AllowRedirection
+Import-PSSession $Session -AllowClobber
+Get-Recipient | fl name, exchangeguid
+Remove-PSSession $Session

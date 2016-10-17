@@ -1,0 +1,222 @@
+The Code Snippets in this file are from the Office 365: Migrating and Managing your Business in the Cloud.
+ISBN: 978-1-4302-6526-9
+
+The code is organized with as <chapter>.<page>
+
+
+@@Page 8.367
+##Standard PowerShell header
+Set-ExecutionPolicy RemoteSigned
+$LiveCred = Get-Credential
+Import-module msonline
+Connect-MSOLService –Credential $LiveCred –Verbose 
+
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange-ConnectionUri https://ps.outlook.com/powershell/ -Credential $LiveCred -Authentication Basic –AllowRedirection
+
+Import-PSSession $Session –Allow Clobber
+
+# Insert Other Power shell commands before remove PSSession
+### Custom code
+#Import Distribuiton list
+Import-Csv "<directory>\distribuiton_list_members_add.csv" |
+##End Custom Code
+
+## Standard terminiation
+Remove-PSSession $Session
+
+
+@@Page 8.368
+## Extend 30-day delete for a mailbox
+## Requires standard header
+Set-mailbox user@contoso.com –retaindeleteditemsfor 30
+
+## Extend 30-day delete for the Organization
+Get-mailbox | Set-mailbox –retaindeleteditemsfor 30
+
+@@Page 8.384
+## Get the deleted users 
+## Requires standard header
+Get-MsolUser –ReturnDeletedUsers
+
+## Remove a specific user
+## Requires standard header
+Remove-MsolUser -ObjectId  <Use objetc ID for user> –RemoveFromRecycleBin
+
+@@Page 8.401
+## Set full details of a conference room using PowerShell: 
+## Requires standard header
+Set-CalendarProcessing –Identity ingoodtaste1 –AddOrganizerToSubject $true –DeleteComments $false –DeleteSubject $false
+
+## Set limited details of a conference room using PowerShell:
+## Requires standard header
+Set-MailboxFolderPermission –AccessRights LimitDetails –Identity ingoodtaste1:\calendar –User default
+
+@@Page 8.408
+##Step 1:  Add the recipient permissions 
+## Requires standard header
+Add-RecipientPermission -Identity user@kamind.com -Trustee trusted@kamind.com -AccessRights SendAs
+
+##Step 2: Add mailbox access permissions
+## Requires standard header
+Add-MailboxPermission -Identity user@kamind.com -User trusted@kamind.com -AccessRights FullAccess -InheritanceType All
+
+@@Page 8.414
+## Add the recipient permissions 
+## Requires standard header
+Add-RecipientPermission -Identity myfakeemail@domain.com -Trustee myrealeamil@domain.com   -AccessRights SendAs
+
+@@Page 8.418
+##Registry Values to bypass Autodiscove
+## See Microsoft KB article – 2612922
+## Office 2007 -> registry key “12”
+## Office 2010 -> registry key “14”
+## Office 2013 -> registry key “15”
+HKEY_CURRENT_USER\Software\Microsoft\Office\12.0\Outlook\AutoDiscover
+
+##Registry Values
+"PreferLocalXML"=dword:1
+"ExcludeHttpRedirect"=dword:0
+"ExcludeHttpsAutodiscoverDomain"=dword:1
+"ExcludeHttpsRootDomain"=dword:1
+"ExcludeScpLookup"=dword:1
+"ExcludeSrvLookup"=dword:1
+"ExcludeSrvRecord"=dword:1
+
+
+##Remove domain force login User ID
+## See Microsft KB article 2848627
+## only add values if present and value is not zero
+
+## HKEY_CURRENT_USER\Software\Microsoft\Office\12.0\Outlook\RPC
+“UseWindowsUserCredentials”=dword:0
+
+## HKEY_CURRENT_USER\Software\Policies\Microsoft\Office\12.0\Outlook\RPC
+“UseWindowsUserCredentials”=dword:0
+
+@@Page 8.421
+## Test Powershell sequence for Installation
+Set-ExecutionPolicy RemoteSigned
+$LiveCred = Get-Credential
+Import-module msonline
+Connect-MSOLService –Credential $LiveCred –Verbose 
+Get-MsolGroup
+
+# Required to close PSS Session
+Remove-PSSession $Session
+
+@@Page 8.423
+##Standard PowerShell header
+Set-ExecutionPolicy RemoteSigned
+$LiveCred = Get-Credential
+Import-module msonline
+Connect-MSOLService –Credential $LiveCred –Verbose 
+
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange-ConnectionUri https://ps.outlook.com/powershell/ -Credential $LiveCred -Authentication Basic –AllowRedirection
+
+Import-PSSession $Session –Allow Clobber
+
+# Insert Other Power shell commands before remove PSSession
+#*********
+# PowerShell Commands go here
+#*********
+
+#Clean up and close the session
+Remove-PSSession $Session
+
+@@Page 8.423 
+##PowerShell: Not Remotely Sign Error
+#The first time you run PowerShell, you may get an error not remotely signed.  To correct this error, you need to enable PowerShell on your system:
+# 1. Start Windows PowerShell as an administrator by right-clicking the Windows PowerShell shortcut and selecting Run as Administrator. 
+# 2. The WinRM service is configured for manual startup by default. You must change the startup type to Automatic and start the service on each computer you want to work with. At the PowerShell prompt, you can verify that the WinRM service is running using the following command: 
+get-service winrm
+
+# If the value of the Status property in the output should be “Running” then
+sc config winrm start= auto
+start winrm 
+
+# Configure Windows PowerShell for remoting, type the following command: 
+Enable-PSRemoting –force
+
+@@Page 8.424
+##PowerShell: Winmail.dat Problem
+
+Set-MailContact <ExternalEmailAddress or GUID> -UseMapiRichTextFormat Never
+
+#Verify that the mail format was applied:
+Get-MailContact | Select <ExternalEmailAddress or GUID> | Select UseMapiRichTextFormat
+
+@@Page 8.424
+#PowerShell: Enable Audit
+Set-Mailbox <Identity> -AuditEnabled $true
+
+#Set multiple mailboxes for audit:
+$UserMailboxes = Get-mailbox -Filter {(RecipientTypeDetails -eq 'UserMailbox')}
+$UserMailboxes | ForEach {Set-Mailbox $_.Identity -AuditEnabled $true}
+
+@@Page 8.424
+##PowerShell: Verification of Audit Logs
+Get-AdminAuditLogConfig
+
+
+@@Page 8.424
+##PowerShell: Mailbox Audit Log search
+New-mailboxAuditLogSearch  -Mailboxes user@domain.com –Startdate 1/1/2010 –EndDate 12/31/2013 –StatusMailRecipients  manager@domain.com
+
+@@Page 8.425
+##PowerShell: Passwords Forever
+Get-MSOLUser | Set-MsolUser -PasswordNeverExpires $true
+
+@@Page 8.425
+##PowerShell: Get Mailbox Statistics
+Get-Mailbox | Get-MailboxStatistics | Select-Object DisplayName,StorageLimitStatus,TotalItemSize
+
+
+@@Page 8.425
+##PowerShell: Enable Litigation Hold – No Notice
+Get-Mailbox -ResultSize unlimited | Set-mailbox -LitigationHoldEnabled $true 
+
+@@Page 8.425
+##PowerShell: Review Permission Assigned to a Mailbox
+Get-MailboxPermission  -Identity user@domain.com 
+
+@@Page 8.425
+##PowerShell: Review the Management Role Assignment to a User Account
+Get-ManagementRoleAssignment- -Enabled $True -Delegating $True
+
+@@Page 8.425
+##PowerShell: Display All Mailbox Forwarders
+Get-Mailbox | Where {$_.ForwardingSMTPAddress -ne $null} | Select Name, ForwardingSMTPAddress, DeliverToMailboxAndForward 
+
+##Turn off all milbox forwarders:
+Get-Mailbox | Where {$_.ForwardingAddress -ne $null} | Set-Mailbox -ForwardingAddress $null
+
+##Turn off a single mailbox forwarder:
+Set-Mailbox <emailaddress>  -ForwardingSmtpAddress $null
+
+@@Page 8.426
+##PowerShell: Change Mailbox Permissions
+Add-MailboxPermission -Identity public@kamind.com -User john@kamind.com -AccessRights FullAccess -InheritanceType All
+
+Add-RecipientPermission -Identity public@kamind.com -Trustee rajk@kamind.com -AccessRights SendAs
+
+@@Page 8.426
+##PowerShell: Assign License to a User Account
+Set-MSOLUser -UserPrincipalName user@domain.com -UsageLocation US
+Set-MSOLUserLicense -UserPrincipalName user@domain.com -AddLicenses {tenantid}:ENTERPRISEPACK
+
+@@Page 8.426
+##PowerShell: Bypass SPAM Filtering for Email
+Set-ContentFilteringConfig –Bypassedrecipients public@kamind.com
+
+@@Page 8.426
+##PowerShell: Extend the Purges Folder to Greater Than 14 Days
+# Extend 30 days delete for a mailbox
+Set-mailbox user@contoso.com –retaindeleteditemsfor 30
+
+# Extend 30 days delete for the Organization
+Get-mailbox | Set-mailbox –retaindeleteditemsfor 30
+
+@@Page 8.426
+##PowerShell: Meeting Room Configuration 
+#Set Conference room to show “limited details – free & busy”
+Set-MailboxFolderPermission –AccessRights LimitDetails –Identity ingoodtaste1:\calendar –User default
